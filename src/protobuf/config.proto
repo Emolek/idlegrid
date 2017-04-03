@@ -1,0 +1,24 @@
+
+message ClientConfigInfo {
+	required string machineId = 1;
+	message Job {
+		enum JobStatus {
+			STATUS_RUNNING = 0;
+			STATUS_DOWNLOADING = 1;
+			STATUS_STOPPED = 2;
+			STATUS_ERROR = 3;
+			STATUS_FINISHED = 4;
+		}
+		required int32 id = 1;
+		required string clientUrl = 2;
+		required JobStatus status = 3;
+		required bool realtime = 4;
+	}
+	repeated Job jobs = 2;
+}
+
+message ServerConfigInfo {
+	required string login = 1;
+	required string password = 2;
+	repeated ClientConfigInfo.Job jobs = 3;
+}

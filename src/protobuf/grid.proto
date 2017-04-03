@@ -1,0 +1,171 @@
+message Packet {
+	enum Type {	// remember to set PACKET_MAPPINGS in idlegrid.packetmanager!
+	
+		// client->server, server->client
+		REGISTER_REQUEST = 0;
+		REGISTER_RESPONSE = 1;
+		PING_REQUEST = 2;
+		PING_RESPONSE = 3; 
+		NEW_JOB_REQUEST = 4;
+		NEW_JOB_RESPONSE = 5;
+		REPORT_JOBS_REQUEST = 6;
+		REPORT_JOBS_RESPONSE = 7;
+		JOB_STATUS_CHANGED = 8;
+		REPORT_SYSTEM_RESOURCES_REQUEST = 9;
+		REPORT_SYSTEM_RESOURCES_RESPONSE = 10;
+		ACTION_REQUEST = 11;
+		JOB_ACTION_REQUEST = 12;
+		JOB_ACTION_RESPONSE = 13;
+		JOB_PROTOCOL = 14;
+		EXCEPTION_MESSAGE = 15;
+		
+		// admin->server, server->admin
+		PACKET_PROXY = 16;
+		AUTHORIZATION_REQUEST = 17;
+		AUTHORIZATION_RESPONSE = 18;
+		REPORT_CLIENTS_REQUEST = 19;
+		REPORT_CLIENTS_RESPONSE = 20;
+		ADMIN_PACKET_PROXY = 21;
+		INCOMING_PACKET_PROXY = 22;
+		
+		ADMIN_NEW_CLIENT = 23;
+		ADMIN_CLIENT_DISCONNECT = 24;
+		
+		AUTHORIZATION_CHALLENGE = 25;
+	} 
+	required Type type = 1;
+
+	required bytes packet = 2;
+}
+
+message RegisterRequest {
+}
+
+message RegisterResponse {
+	required string machineId = 1;
+	required int32 clientVersion = 2 [default = 1];
+}
+
+message PingRequest {
+	optional string data = 1;
+}
+
+message PingResponse {
+	optional string data = 1;
+}
+
+message NewJobRequest {
+	required int32 id = 1;
+	required string clientUrl = 2;
+	optional bool realtime = 3 [default = false];
+}
+
+message NewJobResponse {
+	required int32 id = 1;
+	required bool success = 2;
+	optional string message = 3;
+}
+
+message ReportJobsRequest {
+	repeated int32 reportIds = 1;
+}
+
+message ReportJobsResponse {
+	message JobReport {
+		enum JobStatus {
+			STATUS_RUNNING = 0;
+			STATUS_DOWNLOADING = 1;
+			STATUS_STOPPED = 2;
+			STATUS_ERROR = 3;
+			STATUS_FINISHED = 4;
+		}
+		required int32 id = 1;
+		required JobStatus status = 2;
+	}
+	repeated JobReport jobs = 1;
+}
+
+
+message JobStatusChanged {
+	required int32 id = 1;
+	required ReportJobsResponse.JobReport.JobStatus status = 2;
+}
+
+
+message ReportSystemResourcesRequest {
+	optional bool reportProcessList = 1 [default = false];
+	optional bool reportNode = 2 [default = false];
+	optional bool reportResources = 3 [default = false];
+}
+
+message ReportSystemResourcesResponse {
+	
+
+	// REPORTNODE
+	
+	optional int64 clientVersion = 1 [default = 1];
+	// platform.uname()
+	optional string system = 2; // fe. x86_64, i386
+	optional string node = 3;
+	optional string release = 4;
+	optional string version = 5;
+	optional string machine = 6;
+	optional string processor = 7;	
+	// platform.python_version()
+	optional string python_version = 8;
+	
+	// REPORT_RESOURCES
+	optional int64 memoryFree = 9;
+	optional int64 totalMemory = 10;
+	optional float cpuUsage = 11;
+	optional int64 diskFree = 12;	
+	optional int64 actualTime = 13;
+	
+	
+	// REPORT_PROCESSLIST
+	message Process {
+		required int32 pid = 1;
+		required string name = 2;
+		optional string exe = 3;
+		required string userName = 4;
+		optional float cpuPercent = 5; //takes long time on linux
+		required float memoryPercent = 6;
+	}
+	
+	repeated Process processList = 14;
+}
+
+message ActionRequest {
+	enum Action {
+		ACTION_SHUTDOWN = 0;
+		ACTION_CLOSE = 1;
+	}
+	
+	required Action action = 1;	
+}
+
+message JobActionRequest {
+	required int32 id = 1;
+	enum Action {
+		ACTION_START = 0;
+		ACTION_STOP = 1;
+		ACTION_REMOVE = 2;
+		ACTION_UPDATE = 3;
+	}
+	required Action action = 2;
+}
+
+message JobActionResponse {
+	required int32 id = 1;
+	required bool success = 2;
+	optional string message = 3;
+}
+
+message JobProtocol {
+	required int32 id = 1;
+	required bytes packet = 2;
+}
+
+message ExceptionMessage {
+	required string message = 1;
+}

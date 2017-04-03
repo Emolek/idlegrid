@@ -1,0 +1,55 @@
+import "grid.proto";
+
+message IncomingPacketProxy {
+	required int64 sessionId = 1;
+	required bytes packet = 3;
+}
+
+message PacketProxy {
+	repeated int64 sessionIds = 1;
+	required bytes packet = 2;
+}
+
+message AuthorizationChallenge {
+	required string challenge = 1;
+}
+
+message AuthorizationRequest {
+	required string login = 1;
+	required string password = 2;
+}
+
+message AuthorizationResponse {
+	required bool success = 1;
+}
+
+message ReportClientsRequest {
+}
+
+message ReportClientsResponse {
+	message Client {
+		required int64 sessionId = 1;
+		required string machineId = 2;
+		required string address = 3;
+	}
+	
+	repeated Client clients = 1;
+}
+
+
+message AdminPacketProxy {
+	required bool enabled = 1;
+	optional int64 enabledForSessionId = 2;
+	required bool events = 3;
+}
+
+
+message AdminNewClient {
+	required int64 sessionId = 1;
+	required string machineId = 2;
+	required string address = 3;
+}
+
+message AdminClientDisconnect {
+	required int64 sessionId = 1;
+}

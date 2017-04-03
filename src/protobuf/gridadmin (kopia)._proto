@@ -1,0 +1,73 @@
+import "grid.proto";
+
+message PacketProxy {
+	repeated int64 sessionIds = 1;
+	required bytes packet = 2;
+}
+
+message AuthorizationRequest {
+	required string login = 1;
+	required string password = 2;
+}
+
+message AuthorizationResponse {
+	required bool success = 1;
+}
+
+message AdminStartProxy {	
+}
+
+message AdminStopProxy {	
+}
+
+message ReportClientsRequest {
+}
+
+message ReportClientsResponse {
+	message Client {
+		required int64 sessionId = 1;
+		required string machineId = 2;
+		required string address = 3;
+	}
+	
+	repeated Client clients = 1;
+}
+
+message ReportServerJobsRequest {
+}
+
+message ReportServerJobsResponse {
+	message Job {
+		enum Status {
+			STATUS_RUNNING = 0;
+			STATUS_STOPPED = 1;
+			STATUS_FINISHED = 2;
+		}
+		required int32 id = 1;
+		required Status status = 2;
+	}
+	
+	repeated Job jobs = 1;
+}
+
+message AddServerJobsRequest {
+	required int32 id = 1;
+	required string clientUrl = 2;
+	optional bool realtime = 3 [default = false];
+}
+
+message ServerJobActionRequest {
+	required int32 id = 1;
+	enum Action {
+		ACTION_START = 0;
+		ACTION_STOP = 1;
+		ACTION_DELETE = 2;
+	}
+	required Action action = 2;
+}
+
+message ServerJobActionResponse {
+	required int32 id = 1;
+	required bool success = 2;
+	optional string message = 3;
+}
